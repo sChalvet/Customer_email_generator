@@ -13,41 +13,40 @@ COL_PROJECT_LEAD_EMAIL = 49
 COL_LAST_UPDATE_DATE = 57
 
 
-def get_number_rows(file_path, column):
-    workbook = xlrd.open_workbook(file_path)
-    worksheet = workbook.sheet_by_name(SHEET_NAME)
-    num_cells = 0
-    for cell in worksheet.col(column):
-        if cell.value is not None:
-            num_cells += 1
-    return num_cells
-
-
-def get_column_data(column, numrows, filepath):
-    workbook = xlrd.open_workbook(filepath)
-    worksheet = workbook.sheet_by_name(SHEET_NAME)
-    array = []
-    for x in range(1, numrows):
-        array.append(worksheet.cell(x, column).value)
-    return array
-
-
 def get_hours_worked(start_date, end_date, project_id):
     workbook = xlrd.open_workbook(HOURS_FILE_PATH)
     worksheet = workbook.sheet_by_name(SHEET_NAME)
 
-    num_rows = get_number_rows(HOURS_FILE_PATH, COL_ENTRY_DATE)
-
-    #print(num_rows)
-
-# TODO there is a gap in IDs so we should ignore (pop() all of the entries with no hub ID)
     total_hours = 0
 
-    for x in range(1, num_rows):
-        date_obj = xlrd.xldate_as_datetime(worksheet.cell(x, COL_ENTRY_DATE).value, workbook.datemode)
+    for x in range(1, worksheet.nrows):
+        date_obj = xlrd.xldate_as_datetime(worksheet.cell(x, COL_ENTRY_DATE).value, workbook.datemode).date()
         if worksheet.cell(x, COL_PROJECT_ID).value == int(project_id) and end_date >= date_obj >= start_date:
             total_hours += float(worksheet.cell(x, COL_HOURS).value)
 
     return total_hours
 
+
+def get_lead_email(project_id):
+    workbook = xlrd.open_workbook(HOURS_FILE_PATH)
+    worksheet = workbook.sheet_by_name(SHEET_NAME)
+
+    lead_email = "noEmailFound"
+
+    for x in range(1, worksheet.nrows):
+        if worksheet.cell(x, COL_PROJECT_ID).value == int(project_id):
+            lead_email = worksheet.cell(x, COL_PROJECT_LEAD_EMAIL).value
+            break
+
+    return lead_email
+
+
+def comment_exist(start_date, end_date, last_comment_date, datemode):
+
+    # if the cell isn't empty and within the date range return True
+    if last_comment_date != '' and last_comment_date is not None and \
+            end_date >= xlrd.xldate_as_datetime(last_comment_date, datemode).date() >= start_date:
+        return True
+    else:
+        return False
 
