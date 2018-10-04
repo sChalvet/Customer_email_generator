@@ -2,10 +2,10 @@ import xlrd
 from datetime import datetime
 
 from My_Library import SHEET_NAME, PROJECT_FILE_PATH, get_hours_worked, get_lead_email, comment_exist
-from Credentials import USER_NAME, PASSWORD
+from Pull_from_web import get_comments_and_team_from_web
 
-START_DATE = datetime.strptime('05/17/2018', '%m/%d/%Y').date()
-END_DATE = datetime.strptime('07/26/2018', '%m/%d/%Y').date()
+START_DATE = datetime.strptime('09/04/2018', '%m/%d/%Y').date()
+END_DATE = datetime.strptime('09/21/2018', '%m/%d/%Y').date()
 
 # Column numbers from PROJECT_FILE_PATH workbook
 columns_dict = {
@@ -38,7 +38,7 @@ for row_num in range(1, worksheet.nrows):   # for every row in the sheet
         project_info[col] = worksheet.cell(row_num, columns_dict[col]).value    # get the value of that cell
     if project_info["COL_PROJECT_HUB_ID"] is not None and project_info["COL_PROJECT_HUB_ID"] != '' and \
             project_info["COL_PROJECT_STATUS"] == "Active":     # if the project ID is not null and project is active
-        project_dictionary[project_info["COL_PROJECT_HUB_ID"]] = project_info.copy()    # add project info to dictionary
+        project_dictionary[int(project_info["COL_PROJECT_HUB_ID"])] = project_info.copy()    # add project info to dictionary
 
 # fetch the data from the rows we want in HOURS file
 for key in project_dictionary:
@@ -50,6 +50,8 @@ for key in project_dictionary:
          "COMMENT_EXIST":
              comment_exist(START_DATE, END_DATE, project_dictionary[key].get("COL_PROJECT_LAST_COMMENT_DATE"), workbook.datemode)
          })
+
+project_dictionary = get_comments_and_team_from_web(project_dictionary)
 
 print(project_dictionary)
 

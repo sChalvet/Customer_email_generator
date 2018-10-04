@@ -1,32 +1,40 @@
 from selenium import webdriver
+import time
 from bs4 import BeautifulSoup as soup
-import requests
-from lxml import html
+import Credentials
 
-browser = webdriver.Chrome()
-url = "https://hub.domo.com/project/6879/comments"
-browser.get(url)
+def get_comments_and_team_from_web (project_dictionary):
+    driver = webdriver.Chrome()
+    url = "https://hub.domo.com/login"
+    driver.get(url)
 
-innerHTML = browser.execute_script("return document.body.innerHTML")
+    email = driver.find_element_by_name("email")
+    email.send_keys(Credentials.USERNAME)
 
-# get soup to parse it
-page_soup = soup(innerHTML, "html.parser")
+    password = driver.find_element_by_name("password")
+    password.send_keys(Credentials.PASSWORD)
 
-email_container = page_soup.find("input", {"name": "email"})
-password_container = page_soup.find("input", {"name": "password"})
-token_container = page_soup.find("input", {"name": "_token"}).get('value')
+    driver.find_element_by_id("login-button").click()
 
-payload = {
-    "username": "",
-    "password": "",
-    "_token": token_container
-}
+    time.sleep(1)
 
-session_requests = requests.session()
+# TODO Pull customer emails from their page
+    for key in project_dictionary:
+        if project_dictionary[key].get("COMMENT_EXIST"):
+            url = "https://hub.domo.com/project/" + str(key) + "/comments"
 
-print(token_container)
-# grab all the containers (each product) of a specific class
-#containers = page_soup.findAll("table", {"class": "table table-condensed table-striped"})
+            driver.get(url)
 
-#comment = container.find("td", {"colspan": "2"}).get('value')
-#print(comment)
+            time.sleep(1)
+
+            innerHTML = driver.execute_script("return document.body.innerHTML")
+            page_soup = soup(innerHTML, "html.parser")
+
+            containers = page_soup.findAll("td", {"colspan": "2"})
+
+            project_dictionary[key].update({"COL_COMMENT": containers[0].text})
+        else:
+            project_dictionary[key].update({"COL_COMMENT": "No Comment Found"})
+
+    return project_dictionary
+
