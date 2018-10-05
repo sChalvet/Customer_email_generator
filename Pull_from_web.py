@@ -1,3 +1,7 @@
+# Created by: Samuel Chalvet
+# Email: samuelchalvet@gmail.com
+# On: 10/05/2018
+
 from selenium import webdriver
 import time
 from bs4 import BeautifulSoup as soup

@@ -1,8 +1,8 @@
-import urllib
+# Created by: Samuel Chalvet
+# Email: samuelchalvet@gmail.com
+# On: 10/05/2018
 
-# https://stackoverflow.com/questions/6548570/url-to-compose-a-message-in-gmail-with-full-gmail-interface-and-specified-to-b
-# https://hub.domo.com/api/v2/tracker/myprojects?limit=100&api_token=kFL62x4wo86RyPxNGhsxuovf6xfcDRDKykiF1kSBAfwGOD8XPT83uq9l7Itl
-#import quote_plus
+
 def create_email(project_dictionary, consultant_names_dict, start_date, end_date):
 
     email_mailto_array = []
@@ -75,5 +75,4 @@ def create_email(project_dictionary, consultant_names_dict, start_date, end_date
 
         email_mailto_array.append(mail_to_link)
 
-# TODO add us to bcc
     return email_mailto_array

@@ -1,8 +1,12 @@
+# Created by: Samuel Chalvet
+# Email: samuelchalvet@gmail.com
+# On: 10/05/2018
+
 import xlrd
 from datetime import datetime
 
-PROJECT_FILE_PATH = '../Core_Projects_Majime.xlsx'
-HOURS_FILE_PATH = '../Core_Hours_Majime.xlsx'
+PROJECT_FILE_PATH = '../Services+%7C+CORE%3A+Projects+-+Majime.xlsx'
+HOURS_FILE_PATH = '../Services+%7C+CORE%3A+Hours+-+Majime.xlsx'
 SHEET_NAME = 'Sheet1'
 
 # Column numbers from HOURS_FILE_PATH workbook
@@ -13,10 +17,19 @@ COL_PROJECT_LEAD_EMAIL = 49
 COL_LAST_UPDATE_DATE = 57
 
 
-def get_hours_worked(start_date, end_date, project_id):
-    workbook = xlrd.open_workbook(HOURS_FILE_PATH)
-    worksheet = workbook.sheet_by_name(SHEET_NAME)
+def get_hours_workbook():
+    try:
+        workbook = xlrd.open_workbook(HOURS_FILE_PATH)
+    except FileNotFoundError:
+        raise Warning("Make sure the PROJECT HOURS file is in the same directory.\n They should be: "
+                      "Services+%7C+CORE%3A+Projects+-+Majime and Services+%7C+CORE%3A+Hours+-+Majime")
+        exit()
+    return workbook
 
+
+def get_hours_worked(start_date, end_date, project_id):
+    workbook = get_hours_workbook()
+    worksheet = workbook.sheet_by_name(SHEET_NAME)
     total_hours = 0
 
     for x in range(1, worksheet.nrows):
@@ -28,7 +41,7 @@ def get_hours_worked(start_date, end_date, project_id):
 
 
 def get_lead_email(project_id):
-    workbook = xlrd.open_workbook(HOURS_FILE_PATH)
+    workbook = get_hours_workbook()
     worksheet = workbook.sheet_by_name(SHEET_NAME)
 
     lead_email = "noEmailFound"
