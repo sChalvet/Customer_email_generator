@@ -1,11 +1,19 @@
 import xlrd
 from datetime import datetime
-
+import Config
+from Create_Email import create_email
 from My_Library import SHEET_NAME, PROJECT_FILE_PATH, get_hours_worked, get_lead_email, comment_exist
 from Pull_from_web import get_comments_and_team_from_web
 
-START_DATE = datetime.strptime('09/04/2018', '%m/%d/%Y').date()
-END_DATE = datetime.strptime('09/21/2018', '%m/%d/%Y').date()
+START_DATE = datetime.strptime('10/01/2018', '%m/%d/%Y').date()
+END_DATE = datetime.strptime('10/05/2018', '%m/%d/%Y').date()
+
+consultant_names_dict = {
+    Config.USERNAME_1: Config.USER_EMAIL_1,
+    Config.USERNAME_2: Config.USER_EMAIL_2,
+    Config.USERNAME_3: Config.USER_EMAIL_3,
+    Config.USERNAME_4: Config.USER_EMAIL_4
+}
 
 # Column numbers from PROJECT_FILE_PATH workbook
 columns_dict = {
@@ -53,36 +61,22 @@ for key in project_dictionary:
 
 project_dictionary = get_comments_and_team_from_web(project_dictionary)
 
-print(project_dictionary)
+email_mailto_array = create_email(project_dictionary, consultant_names_dict, START_DATE, END_DATE)
 
-#for entry in project_hours_worked:
-#    print(entry)
+# print(project_dictionary)
+for thing in email_mailto_array:
+    print(thing)
 
-# x = 15
-# print(project_hub_id[x])
-# email_from = project_lead_email[x]
-# email_to = "<customer team emails>"
-# email_cc = csm_email[x] + ", " + account_owner_email[x] + ", kyle@majime.ws, sam@majime.ws"
-# email_body = "Dear " + account_name[x] + ",\n"
-# email_body += "\nThe Majime team is committed to beautiful reliable delivery. A central part of this is good " \
-#               "communication. As such this is your weekly project status report.\n\n"
-# email_body += "\n<b>Project Comments:</b>\n" \
-#               "Hours completed this week: " + str(project_hours_worked[x]) + "\n" \
-#               "<Latest Comment from Hub> OR <default comment if none>\n\n"
-# email_body += "\n<b>Project Summary:</b>\n" \
-#               "<tasks completed>/<tasks remaining>\n" \
-#               + "<b>" + str(all_hours_consumed[x]) + "</b> hours completed of <b>" + str(project_hours_budgeted[x]) + "</b>. " \
-#               "Hours remaining: <b>" + str(hours_remaining[x]) + "</b>\n"
-# email_body += "\n<b>Risks:</b>\n" \
-#               "<Comment from developer>\n"
-# email_body += "\n----------------------------------------------------------------------------------------\n\n" \
-#               "Please let us know if you have any comments or questions.\n\n" \
-#               "You can also find more information in your project hub: https://" + project_domo_instance[x] + "\n\n" \
-#               "Sincerely,\n" \
-#               + project_lead_name[x] + ".\n"
+html_header = "<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>"
+html_footer = "</body></html>"
 
-# https://hub.domo.com/project/7385/comments # TODO: get comments
-# https://hub.domo.com/project/7385/team  # TODO: get customer names and emails
+# TODO add ability to call script with date parameters
+# TODO add ability to enter hub credentials
 
-
-# print(email_body)
+filename = "Project_Email_" + str(START_DATE) + "_to_" + str(END_DATE) + ".html"
+f = open(filename, "w")
+f.write(html_header)
+for email in email_mailto_array:
+    f.write(email)
+f.write(html_footer)
+f.close()
