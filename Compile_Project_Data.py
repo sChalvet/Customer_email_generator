@@ -90,6 +90,9 @@ html_header = "<!DOCTYPE html><html><head><meta http-equiv=\"Content-Type\" cont
 html_footer = "</body></html>"
 
 # TODO add ability to enter hub credentials
+# TODO format date to show real date
+# TODO Remove LLC, Inc, etc
+# TODO change greeting to "Hi Team"
 
 # Print results to HTML file
 filename = "Project_Email_" + str(START_DATE) + "_to_" + str(END_DATE) + ".html"

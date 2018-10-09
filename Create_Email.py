@@ -31,28 +31,25 @@ def create_email(project_dictionary, consultant_names_dict, start_date, end_date
         field_subject = project_dictionary[key].get("COL_ACCOUNT_NAME") + " Domo Status Update From: " \
                         + str(start_date) + " to " + str(end_date)
 
+        # %0D%0A is equivalent of \n
         field_body = "Dear " + project_dictionary[key].get("COL_ACCOUNT_NAME") + ",%0D%0A" \
-                      "%0D%0AThe Majime team is committed to beautiful reliable delivery. A central part of this is " \
-                      "good communication. As such this is your weekly project status report." \
-                      "%0D%0A" \
-                      "%0D%0AProject Status:" \
-                      "%0D%0AHours completed this week: " + str(project_dictionary[key].get("COL_PROJECT_HOURS_WORKED")) \
-                      + "%0D%0A" \
-                      "%0D%0AComment:" \
-                      "%0D%0A" + project_dictionary[key].get("COL_COMMENT") + "" \
-                      "%0D%0A%0D%0A" \
-                      "%0D%0AProject Summary:" \
-                      "%0D%0A" + str(project_dictionary[key].get("COL_ALL_HOURS_CONSUMED")) + " hours completed of " \
-                      "" + str(project_dictionary[key].get("COL_PROJECT_HOURS_BUDGETED")) + "" \
-                      "%0D%0AHours remaining: " + str(project_dictionary[key].get("COL_HOURS_REMAINING")) + "" \
-                      "%0D%0A%0D%0A---%0D%0A" \
-                      "%0D%0APlease let us know if you have any comments or questions." \
-                      "%0D%0A%0D%0A" \
-                      "You can also find more information in your project hub: " \
-                      "https://" + project_dictionary[key].get("COL_PROJECT_DOMO_INSTANCE") + "" \
-                      "%0D%0A%0D%0A" \
-                      "%0D%0ASincerely,%0D%0A" \
-                      + project_dictionary[key].get("COL_PROJECT_LEAD_NAME") + ".%0D%0A"
+                     "%0D%0ABelow is your weekly project status report:" \
+                     "%0D%0A" \
+                     "%0D%0AHours completed this week: " + str(project_dictionary[key].get("COL_PROJECT_HOURS_WORKED")) \
+                     + "%0D%0A" + str(project_dictionary[key].get("COL_HOURS_REMAINING")) + " hours remaining of " \
+                     + str(project_dictionary[key].get("COL_PROJECT_HOURS_BUDGETED")) + " project total." \
+                     + "%0D%0A" \
+                     "%0D%0AComment:" \
+                     "%0D%0A" + project_dictionary[key].get("COL_COMMENT") + "" \
+                     "%0D%0A%0D%0A---%0D%0A" \
+                     "%0D%0AWe are committed to your success, so please let us know if you have any comments or " \
+                     "questions on this email or as the project unfolds." \
+                     "%0D%0A%0D%0A" \
+                     "You can also find more information in your customer instance: " \
+                     "https://" + project_dictionary[key].get("COL_PROJECT_DOMO_INSTANCE") + "" \
+                     "%0D%0A%0D%0A" \
+                     "Sincerely,%0D%0A" \
+                     + project_dictionary[key].get("COL_PROJECT_LEAD_NAME") + ".%0D%0A"
 
         field_body = field_body.replace(" ", "%20")
 
