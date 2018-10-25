@@ -2,7 +2,6 @@
 # Email: samuelchalvet@gmail.com
 # On: 10/05/2018
 
-from bs4 import BeautifulSoup as soup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import time
@@ -19,7 +18,6 @@ def get_comments_and_team_from_web(project_dictionary):
 
     driver = webdriver.Chrome(chrome_options=chrome_options, executable_path=r'bin\chromedriver.exe')
 
-    # driver = webdriver.Chrome()
     url = "https://hub.domo.com/login"
     driver.get(url)
 
@@ -42,12 +40,9 @@ def get_comments_and_team_from_web(project_dictionary):
 
             time.sleep(1)
 
-            innerHTML = driver.execute_script("return document.body.innerHTML")
-            page_soup = soup(innerHTML, "html.parser")
+            container = driver.find_element_by_xpath("//td[@colspan='2']")
 
-            containers = page_soup.findAll("td", {"colspan": "2"})
-
-            project_dictionary[key].update({"Comment": containers[0].text})
+            project_dictionary[key].update({"Comment": container.text})
         else:
             project_dictionary[key].update({"Comment": "No Comment Found"})
 
@@ -61,16 +56,13 @@ def get_comments_and_team_from_web(project_dictionary):
 
             time.sleep(1)
 
-            innerHTML = driver.execute_script("return document.body.innerHTML")
-            page_soup = soup(innerHTML, "html.parser")
-
-            customer_table = page_soup.find("table", {"id": "customer"})
-            customer_team = customer_table.findAll("a", {"class": "name editable editable-click"})
+            customer_table = driver.find_elements_by_xpath(
+                "//table[@id='customer']//a[@class='name editable editable-click']")
 
             # Putting the Team info into a dictionary
             index = 0
-            for team_data in customer_team:
-                s = team_data.get('data-value')
+            for team_data in customer_table:
+                s = team_data.get_attribute("data-value")
 
                 # using re to parse the teams Name, email and role from string
                 team_dict[index] = {
@@ -84,6 +76,8 @@ def get_comments_and_team_from_web(project_dictionary):
             project_dictionary[key].update({"Team Info": team_dict})
         else:
             project_dictionary[key].update({"Team Info": "No Team Members Found"})
+
+    driver.quit()
 
     return project_dictionary
 
