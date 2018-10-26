@@ -51,8 +51,7 @@ def get_comments_and_team_from_web(project_dictionary):
 
                 # using re to parse the teams Name, email and role from string
                 team_dict[index] = {
-                    "name": team_data['first_name'] + " " +
-                            team_data['last_name'],
+                    "name": team_data['first_name'] + " " + team_data['last_name'],
                     "email": team_data['email'],
                     "role": team_data['role']
                 }

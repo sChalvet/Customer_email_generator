@@ -7,9 +7,11 @@ import xlrd
 from datetime import datetime
 import Config
 import Get_Domo_Data
+import Create_Email_JSON
 from Create_Email import create_email
 from My_Library import get_hours_worked, get_lead_email, comment_exist
 from Pull_from_web import get_comments_and_team_from_web
+import json
 
 # Pull start and end date from arguments
 try:
@@ -74,6 +76,11 @@ project_dictionary = get_comments_and_team_from_web(project_dictionary)
 email_mailto_array = create_email(project_dictionary, consultant_names_dict, START_DATE, END_DATE)
 
 print(project_dictionary)
+print("###################################################")
+
+json_emails = Create_Email_JSON.create_email_JSON(project_dictionary, consultant_names_dict, START_DATE, END_DATE)
+
+print(json_emails)
 
 # for thing in email_mailto_array:
 #     print(thing)

@@ -1,11 +1,12 @@
 # Created by: Samuel Chalvet
 # Email: samuelchalvet@gmail.com
-# On: 10/05/2018
+# On: 10/26/2018
 
+import json
 
-def create_email(project_dictionary, consultant_names_dict, start_date, end_date):
+def create_email_JSON(project_dictionary, consultant_names_dict, start_date, end_date):
 
-    email_mailto_array = []
+    email_mailto_dict = {}
     for key in project_dictionary:
         if int(project_dictionary[key].get("Customer Team Count")) > 0:     # !!! If no customer team then no email
 
@@ -38,7 +39,7 @@ def create_email(project_dictionary, consultant_names_dict, start_date, end_date
                             + str(start_date) + " to " + str(end_date)
 
             # %0D%0A is equivalent of \n
-            field_body = "Hi Team,%0D%0A" \
+            field_body1 = "Hi Team,%0D%0A" \
                          "%0D%0ABelow is your weekly project status report:" \
                          "%0D%0A" \
                          "%0D%0AHours completed this week: " + str(project_dictionary[key].get("Project Hours Worked")) \
@@ -46,7 +47,9 @@ def create_email(project_dictionary, consultant_names_dict, start_date, end_date
                          + str(project_dictionary[key].get("Project Hours Budgeted")) + " project total." \
                          + "%0D%0A" \
                          "%0D%0AComment:" \
-                         "%0D%0A" + project_dictionary[key].get("Comment") + "" \
+                         "%0D%0A"
+            comment = project_dictionary[key].get("Comment")
+            field_body2 = "" \
                          "%0D%0A%0D%0A---%0D%0A" \
                          "%0D%0AWe are committed to your success, so please let us know if you have any comments or " \
                          "questions on this email or as the project unfolds." \
@@ -57,25 +60,17 @@ def create_email(project_dictionary, consultant_names_dict, start_date, end_date
                          "Sincerely,%0D%0A" \
                          + project_dictionary[key].get("Project Lead Name") + ".%0D%0A"
 
-            field_body = field_body.replace(" ", "%20")
 
-            # Create Gmail link
+            # Create email dict
             # remove automatically appended comma from last entry using s[:-1]
-            mail_to_link = "<a href=\"https://mail.google.com/mail/?view=cm&fs=1&to=" \
-                           + field_to[:-1] + \
-                           "&cc=" \
-                           + field_cc[:-1] + \
-                           "&bcc=" \
-                           + field_bcc[:-1] + \
-                           "" \
-                           "&su=" \
-                           + field_subject + \
-                           "&body=" \
-                           + field_body + \
-                           "\">" \
-                           + project_dictionary[key].get("Account Name") + \
-                           "</a></br>"
+            email_mailto_dict[key] = {
+                "field_to": field_to[:-1],
+                "field_cc": field_cc[:-1],
+                "field_bcc": field_bcc[:-1],
+                "field_subject": field_subject,
+                "field_body1": field_body1,
+                "field_comment": comment,
+                "field_body2": field_body2
+            }
 
-            email_mailto_array.append(mail_to_link)
-
-    return email_mailto_array
+    return json.loads(json.dumps(email_mailto_dict))
