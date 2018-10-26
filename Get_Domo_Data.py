@@ -33,3 +33,4 @@ def get_domo_data():
 
     pd.read_csv("../project.csv", delimiter=",", encoding="ISO-8859-1").to_excel("../project.xlsx", index=False)
     pd.read_csv("../hours.csv", delimiter=",", encoding="ISO-8859-1").to_excel("../hours.xlsx", index=False)
+    # /tmp/project.csv

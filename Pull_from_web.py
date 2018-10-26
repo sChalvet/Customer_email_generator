@@ -2,82 +2,65 @@
 # Email: samuelchalvet@gmail.com
 # On: 10/05/2018
 
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 import time
 import Config
-import re
+import requests
+from bs4 import BeautifulSoup
+import json
 
 
 def get_comments_and_team_from_web(project_dictionary):
-    chrome_options = Options()
-    chrome_options.add_argument('--headless')
-    chrome_options.add_argument('--no-sandbox')
-    chrome_options.add_argument('--disable-gpu')
-    chrome_options.add_argument('--window-size=1280x1696')
-
-    driver = webdriver.Chrome(chrome_options=chrome_options, executable_path=r'bin\chromedriver.exe')
-
     url = "https://hub.domo.com/login"
-    driver.get(url)
+    body = {'email': Config.USERNAME, 'password': Config.PASSWORD}
 
-    email = driver.find_element_by_name("email")
-    email.send_keys(Config.USERNAME)
+    s = requests.Session()
+    login_page = s.get(url)
+    soup = BeautifulSoup(login_page.text, 'lxml')
 
-    password = driver.find_element_by_name("password")
-    password.send_keys(Config.PASSWORD)
-
-    driver.find_element_by_id("login-button").click()
+    body["_token"] = soup.find("input", {"name": "_token"}).get('value')
+    r = s.post(soup.form['action'], data=body)
 
     time.sleep(1)
 
     for key in project_dictionary:
         # Get project Comment
         if project_dictionary[key].get("Comment Exist"):
-            url_comment = "https://hub.domo.com/project/" + str(key) + "/comments"
+            url_comment = "https://hub.domo.com/project/" + str(key) + "/comments/all"
 
-            driver.get(url_comment)
+            json_comment = json.loads(s.get(url_comment).content)
 
             time.sleep(1)
 
-            container = driver.find_element_by_xpath("//td[@colspan='2']")
-
-            project_dictionary[key].update({"Comment": container.text})
+            project_dictionary[key].update({"Comment": json_comment['data'][0]['comment']})
         else:
             project_dictionary[key].update({"Comment": "No Comment Found"})
 
         # Get Team Emails
         if int(project_dictionary[key].get("Customer Team Count")) > 0:
-            url_team = "https://hub.domo.com/project/" + str(key) + "/team"
+            url_team = "https://hub.domo.com/project/" + str(key) + "/team/customer"
 
             team_dict = {}
 
-            driver.get(url_team)
+            json_team = json.loads(s.get(url_team).content)
 
             time.sleep(1)
 
-            customer_table = driver.find_elements_by_xpath(
-                "//table[@id='customer']//a[@class='name editable editable-click']")
-
             # Putting the Team info into a dictionary
             index = 0
-            for team_data in customer_table:
-                s = team_data.get_attribute("data-value")
+            for team_data in json_team['data']:
 
                 # using re to parse the teams Name, email and role from string
                 team_dict[index] = {
-                    "name": re.search('\"first_name\": \"(.*)\",', s).group(1) + " " +
-                            re.search('\"last_name\": \"(.*)\",', s).group(1),
-                    "email": re.search('\"email\": \"(.*)\",', s).group(1),
-                    "role": re.search('\"role\": \"(.*)\",', s).group(1)
+                    "name": team_data['first_name'] + " " +
+                            team_data['last_name'],
+                    "email": team_data['email'],
+                    "role": team_data['role']
                 }
                 index += 1
 
             project_dictionary[key].update({"Team Info": team_dict})
         else:
             project_dictionary[key].update({"Team Info": "No Team Members Found"})
-
-    driver.quit()
 
     return project_dictionary
 
