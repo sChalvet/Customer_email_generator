@@ -70,7 +70,9 @@ def create_email_JSON(project_dictionary, consultant_names_dict, start_date, end
                 "field_subject": field_subject,
                 "field_body1": field_body1,
                 "field_comment": comment,
-                "field_body2": field_body2
+                "field_body2": field_body2,
+                "send_email": True,
+
             }
 
     return json.loads(json.dumps(email_mailto_dict))
